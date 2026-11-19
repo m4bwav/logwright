@@ -22,6 +22,8 @@ Outcome: a findings report built from what a game or agent recorded, never from 
 
 `LGW query <target> --grind` adds `proposals` (lane, title, value, source). Never write or append to a grind ledger or tracker yourself, even when asked to "turn this into items": show the proposals and hand them to grindwright (`grw.py add`) or the owner. Balance judgement belongs to ludowright.
 
+Onboarding funnel: plan `beat.start`/`beat.complete` per teaching beat (schema has the fixed fields); `query` then adds `beats`, ranked by struggle rate and drop-off.
+
 ## Add telemetry to a game
 
 1. Plan the events first: 5 to 12 named events (`level.start`, `level.fail`, `session.end`...), each line `{ts, sid, ev, f}` per [references/schema.md](../../references/schema.md). `LGW schema <file.jsonl>` validates a recording.

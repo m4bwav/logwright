@@ -21,6 +21,38 @@ def run(*args):
     return code, json.loads(buf.getvalue()) if buf.getvalue().strip().startswith("{") else None
 
 
+class TestBeats(unittest.TestCase):
+    F = os.path.join(FIX, "beats", "session.jsonl")
+
+    def test_ranked_by_struggle_then_drop(self):
+        code, d = run("query", self.F)
+        self.assertEqual(code, 0)
+        b = d["beats"]
+        self.assertEqual([r["beat"] for r in b], ["wall-climb", "jump"])
+        self.assertEqual((b[0]["struggled"], b[0]["dropped"], b[0]["drop_rate"]), (1, 1, 0.5))
+        self.assertEqual(b[1]["struggled"], 1)  # the game's own flag wins over derived
+
+    def test_thresholds_change_struggle(self):
+        code, d = run("query", self.F, "--struggle-deaths", "1", "--struggle-secs", "999")
+        jump = [r for r in d["beats"] if r["beat"] == "jump"][0]
+        self.assertEqual(jump["struggled"], 2)
+
+    def test_grind_and_md(self):
+        tmp = tempfile.mkdtemp()
+        try:
+            md = os.path.join(tmp, "f.md")
+            code, d = run("query", self.F, "--grind", "--md", md)
+            self.assertTrue(any("teaching beat wall-climb" in p["title"] for p in d["proposals"]))
+            with open(md, encoding="utf-8") as fh:
+                self.assertIn("## Teaching beats", fh.read())
+        finally:
+            shutil.rmtree(tmp)
+
+    def test_no_beats_key_without_beat_events(self):
+        code, d = run("query", os.path.join(FIX, "flood", "Player.log"))
+        self.assertNotIn("beats", d)
+
+
 class TestQuery(unittest.TestCase):
     def test_dedupe_by_signature(self):
         code, d = run("query", os.path.join(FIX, "flood", "Player.log"))

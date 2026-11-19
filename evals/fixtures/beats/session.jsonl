@@ -1,0 +1,13 @@
+{"ts":"2026-11-19T10:00:00Z","sid":"a1","ev":"beat.start","f":{"beat":"jump"}}
+{"ts":"2026-11-19T10:00:20Z","sid":"a1","ev":"beat.complete","f":{"beat":"jump","deaths":0,"t":20,"device":"desktop"}}
+{"ts":"2026-11-19T10:00:21Z","sid":"a1","ev":"beat.start","f":{"beat":"wall-climb"}}
+{"ts":"2026-11-19T10:03:40Z","sid":"a1","ev":"beat.complete","f":{"beat":"wall-climb","deaths":5,"t":199,"device":"desktop"}}
+{"ts":"2026-11-19T10:04:00Z","sid":"a1","ev":"pause","f":{"cta_shown":true}}
+{"ts":"2026-11-19T10:05:00Z","sid":"a1","ev":"session.end","f":{"finished":true}}
+{"ts":"2026-11-19T11:00:00Z","sid":"b2","ev":"beat.start","f":{"beat":"jump"}}
+{"ts":"2026-11-19T11:00:15Z","sid":"b2","ev":"beat.complete","f":{"beat":"jump","deaths":1,"t":15,"device":"touch"}}
+{"ts":"2026-11-19T11:00:16Z","sid":"b2","ev":"beat.start","f":{"beat":"wall-climb"}}
+{"ts":"2026-11-19T11:02:00Z","sid":"b2","ev":"pause","f":{"cta_shown":false}}
+{"ts":"2026-11-19T11:02:30Z","sid":"b2","ev":"session.end","scene":"tutorial","f":{}}
+{"ts":"2026-11-19T12:00:00Z","sid":"c3","ev":"beat.start","f":{"beat":"jump"}}
+{"ts":"2026-11-19T12:00:30Z","sid":"c3","ev":"beat.complete","f":{"beat":"jump","deaths":0,"t":30,"struggled":true,"device":"touch"}}
