@@ -1,0 +1,1 @@
+{"type": "assistant", "requestId": "m1", "message": {"role": "assistant", "content": [{"type": "tool_use", "name": "Agent", "input": {"prompt": "x"}}], "usage": {"input_tokens": 1000, "output_tokens": 500, "cache_read_input_tokens": 20000, "cache_creation_input_tokens": 0}}}

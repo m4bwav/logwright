@@ -1,0 +1,10 @@
+{
+  "name": "logwright",
+  "version": "0.1.0",
+  "description": "Local-first logging, crash reports and play telemetry for games and tools, turned into findings: read Unity Player.log, Minecraft and Bedrock logs, Roblox log dumps and crash folders, dedupe errors by stack signature, catch an unplayed build, list where players fail or quit, propose bug and balance items; plan events and give a paste-ready snippet (Unity, Roblox, Bedrock, browser); count a Claude Code session's tool, skill and subagent cost. Use on 'what went wrong in this play session', 'read this Player.log', 'add analytics or a crash reporter to my game', 'turn this log into bugs', 'what did that agent session cost in tool calls', 'is this telemetry safe for a kids game'. Also 'refresh logwright'. Not for daily spend (ccusage), token sinks (tokenwright), live context (context-health) or hosted crash triage (Sentry).",
+  "author": {
+    "name": "Mark Rogers"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/m4bwav/logwright"
+}

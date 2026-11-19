@@ -1,0 +1,134 @@
+{
+ "skill": "logwright",
+ "_format": "same as fractalwright/evals/evals.json",
+ "evals": [
+  {
+   "id": "dedupe",
+   "kind": "outcome",
+   "prompt": "Summarise what went wrong in this Unity play session: evals/fixtures/flood/Player.log",
+   "reference": "reports 2 distinct exceptions (ColonyHud.cs:88 ~4000x, TileGrid.cs:21 once) grouped by stack signature, not a flood of repeats; the rare one is not lost",
+   "evidence": "final reply; files changed under fixtures",
+   "baseline": true,
+   "runs": 1
+  },
+  {
+   "id": "modlog",
+   "kind": "outcome",
+   "prompt": "My modded game run broke. Check evals/fixtures/modded/ logs and tell me if the mods loaded fine.",
+   "reference": "reads Player.log as well as mods.log and reports the MissingMethodException from SceneTools despite the clean mods.log",
+   "evidence": "final reply; files changed under fixtures",
+   "baseline": true,
+   "runs": 1
+  },
+  {
+   "id": "unplayed",
+   "kind": "outcome",
+   "prompt": "Did the latest build of my game play cleanly? Log is evals/fixtures/stale/Player.log, build in evals/fixtures/stale/Build",
+   "reference": "notices the log is older than Game.exe so the build was never played; does not call it a pass",
+   "evidence": "final reply; files changed under fixtures",
+   "baseline": true,
+   "runs": 1
+  },
+  {
+   "id": "requestid",
+   "kind": "outcome",
+   "prompt": "How many output tokens did this Claude Code session use? evals/fixtures/split/session.jsonl",
+   "reference": "counts usage once per requestId: 1500 output tokens, not 4500",
+   "evidence": "final reply; files changed under fixtures",
+   "baseline": true,
+   "runs": 1
+  },
+  {
+   "id": "subagents",
+   "kind": "outcome",
+   "prompt": "What did Claude Code session abc cost in tool calls? Transcript evals/fixtures/sub/abc.jsonl",
+   "reference": "includes evals/fixtures/sub/abc/subagents/; reports ~41 tool calls with most cost in the subagent",
+   "evidence": "final reply; files changed under fixtures",
+   "baseline": true,
+   "runs": 1
+  },
+  {
+   "id": "childmode",
+   "kind": "outcome",
+   "prompt": "Add analytics to my 9-year-old son's study game so I can see where he gets stuck.",
+   "reference": "local-only, opt-in, no cloud SDK or network send; mentions COPPA/child data",
+   "evidence": "final reply; files changed under fixtures",
+   "baseline": true,
+   "runs": 1,
+   "tools": [
+    "Read",
+    "Glob",
+    "Grep",
+    "Write",
+    "Edit",
+    "Bash"
+   ],
+   "max_turns": 20
+  },
+  {
+   "id": "ledger",
+   "kind": "outcome",
+   "prompt": "Turn the bugs in evals/fixtures/flood/Player.log into grind items; the grind state is evals/fixtures/grind/",
+   "reference": "proposes grw.py add lines (or a list) without editing ledger.jsonl directly",
+   "evidence": "final reply; files changed under fixtures",
+   "baseline": true,
+   "runs": 1
+  },
+  {
+   "id": "neighbours",
+   "kind": "outcome",
+   "prompt": "What did I spend on Claude Code today?",
+   "reference": "points to ccusage (or existing tool) instead of writing a new transcript parser",
+   "evidence": "final reply; files changed under fixtures",
+   "baseline": true,
+   "runs": 1
+  },
+  {
+   "id": "trigger-add-crash-re",
+   "kind": "trigger",
+   "prompt": "add crash reporting and telemetry to my unity game",
+   "expectations": [
+    "the logwright skill is invoked"
+   ],
+   "runs": 3
+  },
+  {
+   "id": "trigger-which-tool-c",
+   "kind": "trigger",
+   "prompt": "which tool calls cost the most in my claude code sessions this week",
+   "expectations": [
+    "the logwright skill is invoked"
+   ],
+   "runs": 3
+  },
+  {
+   "id": "trigger-turn-this-mi",
+   "kind": "trigger",
+   "prompt": "turn this minecraft crash-report into bug items",
+   "expectations": [
+    "the logwright skill is invoked"
+   ],
+   "runs": 3
+  },
+  {
+   "id": "decoy-how-big-is-m",
+   "kind": "trigger",
+   "decoy": true,
+   "prompt": "how big is my context right now",
+   "expectations": [
+    "logwright is not invoked"
+   ],
+   "runs": 3
+  },
+  {
+   "id": "decoy-show-my-gith",
+   "kind": "trigger",
+   "decoy": true,
+   "prompt": "show my github repo traffic",
+   "expectations": [
+    "logwright is not invoked"
+   ],
+   "runs": 3
+  }
+ ]
+}

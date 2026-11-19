@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "targets": [
+    {
+      "kind": "reddit",
+      "sub": "gamedev",
+      "keep": "telemetry, analytics and crash reporting methods for indie games"
+    },
+    {
+      "kind": "reddit",
+      "sub": "Unity3D",
+      "weight": "low",
+      "keep": "crash reporting, Player.log and analytics posts"
+    },
+    {
+      "kind": "reddit",
+      "sub": "robloxgamedev",
+      "weight": "low",
+      "keep": "AnalyticsService and logging"
+    },
+    {
+      "kind": "reddit",
+      "sub": "ClaudeAI",
+      "keep": "session cost, transcript parsing, OpenTelemetry"
+    },
+    {
+      "kind": "hn",
+      "query": "opentelemetry logs",
+      "keep": "local-first collectors, points > 50"
+    },
+    {
+      "kind": "hn",
+      "query": "game telemetry",
+      "keep": "methods and privacy, points > 50"
+    },
+    {
+      "kind": "github",
+      "url": "https://github.com/ryoppippi/ccusage",
+      "keep": "releases and new reports"
+    },
+    {
+      "kind": "web",
+      "url": "https://docs.anthropic.com/en/docs/claude-code/monitoring-usage",
+      "keep": "OTEL variables and event names"
+    },
+    {
+      "kind": "web",
+      "url": "https://glitchtip.com/blog",
+      "keep": "self-host changes"
+    }
+  ]
+}

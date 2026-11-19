@@ -1,0 +1,4 @@
+Initialize engine version
+MissingMethodException: Method not found: void Nexus.Units.Unit.SetHp(int)
+  at SceneTools.Patch.Apply () in <0>:0
+Game quit
