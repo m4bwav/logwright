@@ -218,6 +218,39 @@ def iso(t):
     return dt.datetime.fromtimestamp(t).isoformat(timespec="seconds") if t else None
 
 
+def num(v):
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return None
+
+
+def struggled(f, deaths, secs):
+    """Use the game's own flag when sent, else derive it: deaths or seconds past the threshold."""
+    if isinstance(f.get("struggled"), bool):
+        return f["struggled"]
+    d, t = num(f.get("deaths")), num(f.get("t"))
+    return (d is not None and d >= deaths) or (t is not None and t >= secs)
+
+
+def teaching_beats(starts, done, deaths, secs):
+    """One row per teaching beat, ranked by struggle rate, then drop-off."""
+    rows = []
+    for key in list(starts) + [k for k in done if k not in starts]:
+        comp = done.get(key, [])
+        csids = {s for s, _ in comp}
+        started = len(starts.get(key) or csids) or len(comp)
+        hard = sum(1 for _, f in comp if struggled(f, deaths, secs))
+        ts = sorted(t for t in (num(f.get("t")) for _, f in comp) if t is not None)
+        dropped = len(starts.get(key, set()) - csids)
+        rows.append({"beat": key, "started": started, "completed": len(comp), "struggled": hard,
+                     "struggle_rate": round(hard / len(comp), 3) if comp else 0.0,
+                     "dropped": dropped, "drop_rate": round(dropped / started, 3) if started else 0.0,
+                     "median_t": ts[len(ts) // 2] if ts else None})
+    rows.sort(key=lambda r: (-r["struggle_rate"], -r["drop_rate"], r["beat"]))
+    return rows
+
+
 def cmd_query(a):
     if not os.path.exists(a.target):
         return out({"ok": False, "error": "not found: " + a.target}, 1)
@@ -227,6 +260,7 @@ def cmd_query(a):
     last_scene, quit_at, per_file = None, None, {}
     by_level = collections.Counter()
     sids, finished = set(), set()
+    beat_start, beat_done = collections.defaultdict(set), collections.defaultdict(list)
     for p in files:
         kind, evs = read_any(p)
         per_file[p] = {"kind": kind, "events": len(evs)}
@@ -246,6 +280,12 @@ def cmd_query(a):
                     sids.add(e["sid"])
                 if re.search(r"fail|death|die|retry|stuck", name):
                     by_level[(name, str(f.get("level") or e.get("scene") or "?"))] += 1
+                if name in ("beat.start", "beat.complete") and f.get("beat") is not None:
+                    key = str(f["beat"])
+                    if name == "beat.start":
+                        beat_start[key].add(e.get("sid"))
+                    else:
+                        beat_done[key].append((e.get("sid"), f))
                 if name in ("session.end", "quit"):
                     if f.get("finished"):
                         finished.add(e.get("sid"))
@@ -261,6 +301,7 @@ def cmd_query(a):
     if not findings and not play:
         warnings.append("no events found; check the log path and that the session ran")
     balance = [{"ev": k, "count": v} for k, v in play.most_common() if re.search(r"fail|death|die|retry|stuck", k)]
+    beats = teaching_beats(beat_start, beat_done, a.struggle_deaths, a.struggle_secs)
     res = {"ok": True, "files": per_file, "errors_distinct": len(findings),
            "errors_total": sum(g["count"] for g in findings), "errors": findings[: a.limit],
            "play": dict(play.most_common(30)), "balance_signals": balance,
@@ -268,6 +309,8 @@ def cmd_query(a):
            "sessions": {"total": len(sids), "finished": len(finished)},
            "quit_point": quit_at or (last_scene if play and len(finished) < len(sids) else None),
            "warnings": warnings}
+    if beats:
+        res["beats"] = beats
     if a.grind:
         res["proposals"] = [
             {"lane": "bug", "title": "%s at %s (x%d)" % (g["msg"].split(":")[0][:60], g["where"] or "?", g["count"]),
@@ -275,6 +318,9 @@ def cmd_query(a):
              "source": "%s %s" % (a.target, g["first"])} for g in findings]
         res["proposals"] += [{"lane": "balance", "title": "%s at %s happened %d times" % (b["ev"], b["level"], b["count"]),
                               "value": 3, "source": a.target} for b in res["balance_by_level"] if b["count"] > 1]
+        res["proposals"] += [{"lane": "balance", "title": "teaching beat %s: %d%% struggled, %d%% dropped" % (
+            b["beat"], round(100 * b["struggle_rate"]), round(100 * b["drop_rate"])), "value": 4, "source": a.target}
+            for b in beats if b["struggle_rate"] >= 0.3 or b["drop_rate"] >= 0.2]
         res["note"] = ("proposals only: hand them to grindwright (grw.py add) or the owner; "
                        "logwright never writes a ledger")
     if a.md:
@@ -294,6 +340,11 @@ def cmd_query(a):
         if by_level:
             md.append("\n## Balance by level\n\n| count | event | level |\n|---|---|---|")
             md += ["| %d | %s | %s |" % (v, k[0], k[1].replace("|", "/")) for k, v in by_level.most_common(a.limit)]
+        if beats:
+            md += ["", "## Teaching beats (worst first)", "",
+                   "| beat | started | completed | struggled | drop-off |", "|---|---|---|---|---|"]
+            md += ["| %s | %d | %d | %d%% | %d%% |" % (b["beat"].replace("|", "/"), b["started"], b["completed"],
+                   round(100 * b["struggle_rate"]), round(100 * b["drop_rate"])) for b in beats]
         with open(a.md, "w", encoding="utf-8", newline="\n") as fh:
             fh.write("\n".join(md) + "\n")
         res["markdown"] = a.md
@@ -444,6 +495,8 @@ def main(argv=None):
     s.add_argument("--grind", action="store_true", help="add proposed grind items (never written)")
     s.add_argument("--md", help="also write findings markdown here")
     s.add_argument("--limit", type=int, default=50)
+    s.add_argument("--struggle-deaths", type=float, default=3, help="beat.complete deaths at or above this mean struggled")
+    s.add_argument("--struggle-secs", type=float, default=120, help="beat.complete seconds (f.t) at or above this mean struggled")
     s = sp.add_parser("agent", help="tool, skill and subagent cost from Claude Code transcripts")
     s.add_argument("transcripts", nargs="*")
     s.add_argument("--days", type=float, default=1)
