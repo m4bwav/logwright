@@ -2,7 +2,7 @@
 
 ![logwright banner](.github/images/banner.jpg)
 
-Local-first logging, crash reports and play telemetry for games and tools, turned into findings. A Claude Code plugin with one skill and a standard-library script.
+Local-first logging, crash reports and play telemetry for games and tools, turned into findings. An agent plugin with one skill and a standard-library script.
 
 - Reads Unity, Minecraft, Bedrock and Roblox logs and crash folders; groups errors by stack signature; warns when a build was never played.
 - Turns a play session into findings: crashes, error groups, fails, deaths, quit point, and proposed bug and balance items.
